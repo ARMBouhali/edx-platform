@@ -529,7 +529,7 @@ class CourseGradeReport(GradeReportBase):
         Returns a list of all applicable column headers for this grade report.
         """
         return (
-            ["Student ID", "Email", "Username"] +
+            ["Student ID", "Email", "Username", "Wilaya", "Group", "Code"] +
             self._grades_header() +
             (['Cohort Name'] if self.context.cohorts_enabled else []) +
             [f'Experiment Group ({partition.name})' for partition in self.context.course_experiments] +
@@ -543,7 +543,7 @@ class CourseGradeReport(GradeReportBase):
         """
         Returns a list of error headers for this grade report.
         """
-        return ["Student ID", "Username", "Error"]
+        return ["Student ID", "Username", "Wilaya", "Group", "Code", "Error"]
 
     def _grades_header(self):
         """
@@ -571,12 +571,16 @@ class CourseGradeReport(GradeReportBase):
                 collected_block_structure=self.context.course_structure,
                 course_key=self.context.course_id,
             ):
+                profile_meta = user.profile.get_meta() if user.profile else {}
+                wilaya = profile_meta.get('wilaya') or ''
+                group = profile_meta.get('group') or ''
+                code = profile_meta.get('code') or ''
                 if not course_grade:
                     # An empty gradeset means we failed to grade a student.
-                    error_rows.append([user.id, user.username, str(error)])
+                    error_rows.append([user.id, user.username, wilaya, group, code, str(error)])
                 else:
                     success_rows.append(
-                        [user.id, user.email, user.username] +
+                        [user.id, user.email, user.username, wilaya, group, code] +
                         self._user_grades(course_grade) +
                         self._user_cohort_group_names(user) +
                         self._user_experiment_group_names(user) +
@@ -743,7 +747,14 @@ class ProblemGradeReport(GradeReportBase):
 
     def _problem_grades_header(self):
         """Problem Grade report header."""
-        return OrderedDict([('id', 'Student ID'), ('email', 'Email'), ('username', 'Username')])
+        return OrderedDict([
+            ('id', 'Student ID'),
+            ('email', 'Email'),
+            ('username', 'Username'),
+            ('wilaya', 'Wilaya'),
+            ('group', 'Group'),
+            ('code', 'Code'),
+        ])
 
     def _rows_for_users(self, users):
         """
@@ -756,13 +767,17 @@ class ProblemGradeReport(GradeReportBase):
             collected_block_structure=self.context.course_structure,
             course_key=self.context.course_id,
         ):
+            profile_meta = student.profile.get_meta() if student.profile else {}
+            wilaya = profile_meta.get('wilaya') or ''
+            group = profile_meta.get('group') or ''
+            code = profile_meta.get('code') or ''
             if not course_grade:
                 err_msg = str(error)
                 # There was an error grading this student.
                 if not err_msg:
                     err_msg = 'Unknown error'
                 error_rows.append(
-                    [student.id, student.email, student.username] +
+                    [student.id, student.email, student.username, wilaya, group, code] +
                     [err_msg]
                 )
                 continue
@@ -781,7 +796,7 @@ class ProblemGradeReport(GradeReportBase):
 
             enrollment_status = _user_enrollment_status(student, self.context.course_id)
             success_rows.append(
-                [student.id, student.email, student.username] +
+                [student.id, student.email, student.username, wilaya, group, code] +
                 [enrollment_status, course_grade.percent] +
                 _flatten(earned_possible_values)
             )

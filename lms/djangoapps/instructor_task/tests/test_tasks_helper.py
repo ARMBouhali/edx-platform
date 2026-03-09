@@ -839,7 +839,7 @@ class TestProblemGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
         # technically possible in openedx.
         self.student_1 = self.create_student('üser_1')
         self.student_2 = self.create_student('üser_2')
-        self.csv_header_row = ['Student ID', 'Email', 'Username', 'Enrollment Status', 'Grade']
+        self.csv_header_row = ['Student ID', 'Email', 'Username', 'Wilaya', 'Group', 'Code', 'Enrollment Status', 'Grade']
 
     @patch('lms.djangoapps.instructor_task.tasks_helper.runner._get_current_task')
     @ddt.data(True, False)
@@ -858,11 +858,11 @@ class TestProblemGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
         self.verify_rows_in_csv([
             dict(list(zip(
                 self.csv_header_row,
-                [str(self.student_1.id), self.student_1.email, self.student_1.username, ENROLLED_IN_COURSE, '0.0']
+                [str(self.student_1.id), self.student_1.email, self.student_1.username, '', '', '', ENROLLED_IN_COURSE, '0.0']
             ))),
             dict(list(zip(
                 self.csv_header_row,
-                [str(self.student_2.id), self.student_2.email, self.student_2.username, ENROLLED_IN_COURSE, '0.0']
+                [str(self.student_2.id), self.student_2.email, self.student_2.username, '', '', '', ENROLLED_IN_COURSE, '0.0']
             )))
         ])
 
@@ -894,6 +894,9 @@ class TestProblemGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
                     str(self.student_1.id),
                     self.student_1.email,
                     self.student_1.username,
+                    '',
+                    '',
+                    '',
                     ENROLLED_IN_COURSE,
                     '0.01', '1.0', '2.0',
                 ]
@@ -904,6 +907,9 @@ class TestProblemGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
                     str(self.student_2.id),
                     self.student_2.email,
                     self.student_2.username,
+                    '',
+                    '',
+                    '',
                     ENROLLED_IN_COURSE,
                     '0.0', 'Not Attempted', '2.0',
                 ]
@@ -968,6 +974,9 @@ class TestProblemGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
                     str(self.student_1.id),
                     self.student_1.email,
                     self.student_1.username,
+                    '',
+                    '',
+                    '',
                     ENROLLED_IN_COURSE,
                     '0.01', '1.0', '2.0',
                 ]
@@ -978,6 +987,9 @@ class TestProblemGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
                     str(self.student_2.id),
                     self.student_2.email,
                     self.student_2.username,
+                    '',
+                    '',
+                    '',
                     ENROLLED_IN_COURSE,
                     '0.0', 'Not Attempted', '2.0',
                 ]
@@ -988,6 +1000,9 @@ class TestProblemGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
                     str(inactive_student.id),
                     inactive_student.email,
                     inactive_student.username,
+                    '',
+                    '',
+                    '',
                     NOT_ENROLLED_IN_COURSE,
                     '0.0', 'Not Attempted', '2.0',
                 ]
@@ -1039,7 +1054,7 @@ class TestProblemReportSplitTestContent(TestReportMixin, TestConditionalContent,
             )
 
         problem_names = ['Homework 1: Subsection - problem_a_url', 'Homework 1: Subsection - problem_b_url']
-        header_row = ['Student ID', 'Email', 'Username', 'Enrollment Status', 'Grade']
+        header_row = ['Student ID', 'Email', 'Username', 'Wilaya', 'Group', 'Code', 'Enrollment Status', 'Grade']
         for problem in problem_names:
             header_row += [problem + ' (Earned)', problem + ' (Possible)']
 
@@ -1050,6 +1065,9 @@ class TestProblemReportSplitTestContent(TestReportMixin, TestConditionalContent,
                     str(self.student_a.id),
                     self.student_a.email,
                     self.student_a.username,
+                    '',
+                    '',
+                    '',
                     ENROLLED_IN_COURSE,
                     '1.0', '2.0', '2.0', 'Not Available', 'Not Available'
                 ]
@@ -1060,6 +1078,9 @@ class TestProblemReportSplitTestContent(TestReportMixin, TestConditionalContent,
                     str(self.student_b.id),
                     self.student_b.email,
                     self.student_b.username,
+                    '',
+                    '',
+                    '',
                     ENROLLED_IN_COURSE,
                     '0.5', 'Not Available', 'Not Available', '1.0', '2.0'
                 ]
@@ -1123,7 +1144,7 @@ class TestProblemReportSplitTestContent(TestReportMixin, TestConditionalContent,
             title = 'Homework %d 1: Problem section %d - %s' % (i, i, problem_url)
             problem_names.append(title)
 
-        header_row = ['Student ID', 'Email', 'Username', 'Enrollment Status', 'Grade']
+        header_row = ['Student ID', 'Email', 'Username', 'Wilaya', 'Group', 'Code', 'Enrollment Status', 'Grade']
         for problem in problem_names:
             header_row += [problem + ' (Earned)', problem + ' (Possible)']
 
@@ -1173,6 +1194,9 @@ class TestProblemReportCohortedContent(TestReportMixin, ContentGroupTestCase, In
                 str(user.id),
                 user.email,
                 user.username,
+                '',
+                '',
+                '',
                 enrollment_status,
             ] + grade
         )))
@@ -1196,7 +1220,7 @@ class TestProblemReportCohortedContent(TestReportMixin, ContentGroupTestCase, In
                 result,
             )
         problem_names = ['Homework 1: Subsection - Problem0', 'Homework 1: Subsection - Problem1']
-        header_row = ['Student ID', 'Email', 'Username', 'Enrollment Status', 'Grade']
+        header_row = ['Student ID', 'Email', 'Username', 'Wilaya', 'Group', 'Code', 'Enrollment Status', 'Grade']
         for problem in problem_names:
             header_row += [problem + ' (Earned)', problem + ' (Possible)']
 
